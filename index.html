@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; frame-src https://*.firebaseapp.com https://*.google.com; object-src 'none'; base-uri 'self'">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureVault 3D — Next-Gen Password Manager</title>
+  <meta name="description" content="A stunning 3D interactive password manager with real-time analytics, military-grade encryption, and beautiful data visualizations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Google Fonts CSS cannot use SRI — response varies by user-agent -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#">SecureVault</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#hero" class="active">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#vault">Vault</a></li>
+      <li><a href="#analytics">Analytics</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="firebase-setup-banner" id="firebaseSetupBanner" style="display:none" title="Set up Google Sync">
+        ⚙️ Set up Google Sync
+      </button>
+      <div class="sync-status" id="syncStatusBar">
+        <span class="sync-dot sync-disconnected" id="syncDot"></span>
+        <span class="sync-text" id="syncText">Not signed in</span>
+        <img class="sync-avatar" id="syncAvatar" style="display:none" alt="avatar">
+      </div>
+      <button class="nav-icon-btn" id="btnLockVault" title="Lock Vault" style="display:none">&#x1F512;</button>
+      <button class="nav-icon-btn" id="btnSettings" title="Settings">&#x2699;&#xFE0F;</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-content">
+      <h1>Secure<span class="gradient-text">Vault</span> 3D</h1>
+      <p>Next-generation password security with real-time 3D analytics, military-grade encryption, and a breathtaking immersive experience.</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" id="btnGetStarted">&#x1F512; Get Started</button>
+        <a class="btn btn-outline" href="#features">Explore Features</a>
+      </div>
+    </div>
+    <div class="hero-scroll"><span></span></div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features">
+    <div class="section-header reveal">
+      <h2>Why <span class="gradient-text">SecureVault</span>?</h2>
+      <p>Enterprise-grade security meets stunning visual design. Every feature built with precision.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal" style="transition-delay:.1s">
+        <div class="feature-icon">&#x1F510;</div>
+        <h3>Military Encryption</h3>
+        <p>AES-256-GCM encryption with PBKDF2 key derivation (600K iterations) keeps your passwords locked behind military-grade walls of security.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.2s">
+        <div class="feature-icon">&#x1F3B2;</div>
+        <h3>Smart Generator</h3>
+        <p>Generate ultra-strong passwords with customizable length, symbols, numbers and character sets.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.3s">
+        <div class="feature-icon">&#x1F4CA;</div>
+        <h3>3D Analytics</h3>
+        <p>Visualize your security posture with interactive 3D charts and real-time strength breakdowns.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.4s">
+        <div class="feature-icon">&#x1F50D;</div>
+        <h3>Instant Search</h3>
+        <p>Find any credential in milliseconds with blazing-fast search across your entire vault.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.5s">
+        <div class="feature-icon">&#x1F4E6;</div>
+        <h3>Export &amp; Import</h3>
+        <p>Backup your entire vault as encrypted JSON. Import on any device — your data travels with you securely.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:.6s">
+        <div class="feature-icon">&#x1F3F7;&#xFE0F;</div>
+        <h3>Custom Categories</h3>
+        <p>Organize passwords into custom categories you create. Delete or rename categories anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vault Section -->
+  <section id="vault">
+    <div class="section-header reveal">
+      <h2>Your <span class="gradient-text">Vault</span></h2>
+      <p>Securely manage all your credentials in one beautiful place.</p>
+    </div>
+    <div class="vault-toolbar reveal">
+      <input type="text" class="vault-search" id="vaultSearch" placeholder="&#x1F50E; Search passwords...">
+      <select class="vault-filter" id="vaultCategoryFilter">
+        <option value="">All Categories</option>
+      </select>
+      <select class="vault-sort" id="vaultSort">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="strength">Weakest First</option>
+      </select>
+      <button class="btn-export-all" id="btnExportAll">&#x1F4E5; Export All</button>
+      <button class="btn-add" id="btnAddPwd">&#x2795; Add Password</button>
+    </div>
+    <div class="vault-actions-bar" id="vaultActionsBar" style="display:none">
+      <label class="select-all-label">
+        <input type="checkbox" id="selectAllPwds"> Select All
+      </label>
+      <span id="selectedCount">0 selected</span>
+      <button class="btn-bulk-delete" id="btnBulkDelete">&#x1F5D1;&#xFE0F; Delete Selected</button>
+      <button class="btn-bulk-export" id="btnBulkExport">&#x1F4E4; Export Selected</button>
+    </div>
+    <div class="vault-grid" id="vaultGrid">
+      <div class="vault-empty" id="vaultEmpty">
+        <div class="empty-icon">&#x1F512;</div>
+        <p>Your vault is empty. Click "Add Password" to get started.</p>
+      </div>
+    </div>
+    <div class="vault-footer-actions reveal" id="vaultFooterActions" style="display:none">
+      <button class="btn btn-outline" id="btnExportVault">&#x1F4E4; Export Vault</button>
+      <button class="btn btn-outline" id="btnImportVault">&#x1F4E5; Import Vault</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none">
+    </div>
+  </section>
+
+  <!-- Analytics Section -->
+  <section id="analytics">
+    <div class="analytics-container">
+      <div class="section-header reveal">
+        <h2>3D <span class="gradient-text">Analytics</span></h2>
+        <p>Real-time security insights visualized in stunning 3D.</p>
+      </div>
+      <div class="stats-grid reveal">
+        <div class="stat-card">
+          <div class="stat-number cyan" id="statTotal">0</div>
+          <div class="stat-label">Total Passwords</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number green" id="statStrong">0</div>
+          <div class="stat-label">Strong</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number purple" id="statMedium">0</div>
+          <div class="stat-label">Medium</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number rose" id="statWeak">0</div>
+          <div class="stat-label">Weak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number amber" id="statCategories">0</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number cyan" id="statAvgStrength">—</div>
+          <div class="stat-label">Avg Strength</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number rose" id="statDuplicates">0</div>
+          <div class="stat-label">Duplicates</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number green" id="statOldest">—</div>
+          <div class="stat-label">Oldest (days)</div>
+        </div>
+      </div>
+      <div class="chart-wrapper reveal">
+        <canvas id="analytics-canvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-disclaimer">
+      <p class="disclaimer-text">⚠️ <strong>Security Notice:</strong> SecureVault is a personal/educational project. It has not been independently audited. Do not rely on it as your sole password manager for critical accounts (banking, email, etc.). Use a professionally audited solution like Bitwarden or 1Password for high-stakes credentials.</p>
+    </div>
+    <p>&copy; 2026 SecureVault 3D — Built with &#x2764;&#xFE0F; and <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">Three.js</a></p>
+  </footer>
+
+  <!-- Add/Edit Password Modal -->
+  <div class="modal-overlay" id="modalAdd">
+    <div class="modal">
+      <h3 id="modalAddTitle">&#x2795; Add New Password</h3>
+      <input type="hidden" id="editIndex" value="-1">
+      <div class="form-group">
+        <label for="pwdSite">Website / App</label>
+        <input type="text" id="pwdSite" placeholder="e.g. google.com">
+      </div>
+      <div class="form-group">
+        <label for="pwdUser">Username / Email</label>
+        <input type="text" id="pwdUser" placeholder="e.g. john@gmail.com">
+      </div>
+      <div class="form-group">
+        <label for="pwdCategory">Category</label>
+        <div class="category-manager">
+          <select id="pwdCategory"></select>
+          <button class="cat-btn cat-btn-add" id="btnNewCategory" title="Create new category">&#x2795;</button>
+          <button class="cat-btn cat-btn-del" id="btnDeleteCategory" title="Delete selected category">&#x1F5D1;&#xFE0F;</button>
+        </div>
+      </div>
+      <div class="form-group" id="newCategoryGroup" style="display:none">
+        <label for="newCategoryInput">New Category Name</label>
+        <div class="new-category-row">
+          <input type="text" id="newCategoryInput" placeholder="Enter category name...">
+          <button class="btn btn-primary btn-sm" id="btnConfirmNewCat">Add</button>
+          <button class="btn btn-outline btn-sm" id="btnCancelNewCat">Cancel</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pwdPass">Password</label>
+        <div class="password-input-row">
+          <input type="password" id="pwdPass" placeholder="Enter or generate a password">
+          <button class="pwd-toggle-btn" id="btnTogglePwdVisibility" title="Show/Hide password">&#x1F441;</button>
+        </div>
+        <div class="pwd-strength-indicator" id="pwdStrengthIndicator">
+          <div class="pwd-strength-bar">
+            <div class="pwd-strength-fill" id="pwdStrengthFill"></div>
+          </div>
+          <span class="pwd-strength-label" id="pwdStrengthLabel"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pwdNotes">Notes (optional)</label>
+        <textarea id="pwdNotes" placeholder="Add any notes about this credential..." rows="3"></textarea>
+      </div>
+      <button class="btn btn-outline" id="btnOpenGen" style="width:100%;justify-content:center;margin-bottom:.5rem">&#x1F3B2; Generate Password</button>
+      <div id="generatorPanel" style="display:none;margin-bottom:1rem">
+        <div class="generator-row">
+          <label style="font-size:.85rem;color:var(--text-dim)">Length:</label>
+          <input type="range" id="genLength" min="8" max="64" value="16">
+          <span id="genLengthVal">16</span>
+        </div>
+        <div class="generator-checks">
+          <label><input type="checkbox" id="genUpper" checked> Uppercase</label>
+          <label><input type="checkbox" id="genLower" checked> Lowercase</label>
+          <label><input type="checkbox" id="genNumbers" checked> Numbers</label>
+          <label><input type="checkbox" id="genSymbols" checked> Symbols</label>
+        </div>
+        <div class="generated-pwd">
+          <span id="genResult">—</span>
+          <button class="btn btn-outline" style="padding:.3rem .6rem;font-size:.75rem" id="btnUseGen">Use</button>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:.6rem" id="btnGenerate">&#x1F504; Generate</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelAdd">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveAdd">&#x1F4BE; Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Password Modal -->
+  <div class="modal-overlay" id="modalMaster">
+    <div class="modal">
+      <h3 id="masterTitle">&#x1F510; Set Master Password</h3>
+      <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:1.5rem" id="masterDesc">Create a master password to secure your vault. Remember it — it cannot be recovered.</p>
+      <div class="form-group">
+        <label for="masterPass">Master Password</label>
+        <input type="password" id="masterPass" placeholder="Enter master password">
+      </div>
+      <div class="form-group" id="masterConfirmGroup">
+        <label for="masterConfirm">Confirm Password</label>
+        <input type="password" id="masterConfirm" placeholder="Confirm master password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelMaster">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitMaster">&#x1F513; Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="modal modal-settings">
+      <h3>&#x2699;&#xFE0F; Settings</h3>
+      <div class="settings-section">
+        <h4>Appearance</h4>
+        <div class="settings-row">
+          <label>Theme</label>
+          <div class="theme-toggle" id="themeToggle">
+            <button class="theme-btn active" data-theme="dark">&#x1F319; Dark</button>
+            <button class="theme-btn" data-theme="light">&#x2600;&#xFE0F; Light</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>Security</h4>
+        <div class="settings-row">
+          <label>Auto-Lock Timer</label>
+          <select id="autoLockTimer">
+            <option value="0">Never</option>
+            <option value="1">1 minute</option>
+            <option value="5" selected>5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <button class="btn btn-outline btn-sm" id="btnChangeMaster">&#x1F511; Change Master Password</button>
+        </div>
+        <div class="settings-row">
+          <button class="btn btn-outline btn-sm btn-danger" id="btnResetVault">&#x1F4A3; Reset Entire Vault</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>Categories</h4>
+        <div class="category-list" id="settingsCategoryList"></div>
+        <div class="settings-row" style="margin-top:.75rem">
+          <input type="text" id="settingsNewCat" placeholder="New category name..." class="settings-input">
+          <button class="btn btn-primary btn-sm" id="btnSettingsAddCat">&#x2795; Add</button>
+        </div>
+      </div>
+      <div class="settings-section" id="firebaseSettingsSection">
+        <h4>&#x2601;&#xFE0F; Google Sync</h4>
+        <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.75rem">Connect your own Firebase project to sync your encrypted vault across devices. Your passwords remain encrypted — Google only stores the encrypted data.</p>
+
+        <!-- Configured State: shown when Firebase is ready -->
+        <div id="firebaseConfiguredState" style="display:none">
+          <div class="firebase-configured-info">
+            <div class="firebase-project-badge">
+              <span class="firebase-project-icon">🔥</span>
+              <div>
+                <div class="firebase-project-label">Connected Project</div>
+                <div class="firebase-project-id" id="firebaseProjectId">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span id="syncUserName" style="color:var(--text);font-size:.85rem"></span>
+          </div>
+          <div class="settings-row">
+            <button class="btn btn-google" id="btnGoogleSign">&#x1F310; Sign in with Google</button>
+            <button class="btn btn-outline btn-sm" id="btnGoogleSignOut" style="display:none">Sign Out</button>
+          </div>
+          <div class="settings-row">
+            <button class="btn btn-outline btn-sm" id="btnForceSync" title="Force sync now">&#x1F504; Sync Now</button>
+            <button class="btn btn-outline btn-sm btn-danger" id="btnClearFirebase" title="Remove Firebase config">&#x1F5D1;&#xFE0F; Remove Config</button>
+          </div>
+        </div>
+
+        <!-- Setup State: shown when no Firebase config exists -->
+        <div id="firebaseSetupState">
+          <div class="firebase-instructions-toggle">
+            <button class="btn btn-outline btn-sm" id="btnToggleInstructions" style="width:100%;justify-content:center">📋 Show Setup Instructions</button>
+          </div>
+          <div class="firebase-instructions" id="firebaseInstructions" style="display:none">
+            <div class="instruction-group">
+              <div class="instruction-group-title">Create Firebase Project</div>
+              <ol class="instruction-steps">
+                <li>Go to <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer">console.firebase.google.com</a></li>
+                <li>Click <strong>"Add project"</strong> → name it anything → Continue</li>
+                <li>Disable Google Analytics (not needed) → <strong>Create project</strong></li>
+                <li>Click <strong>"Web" icon (<code>&lt;/&gt;</code>)</strong> to add a web app</li>
+                <li>Register app with any nickname → skip Firebase Hosting</li>
+                <li>Copy the <code>firebaseConfig</code> object shown</li>
+                <li>Paste each value into the fields below</li>
+              </ol>
+            </div>
+            <div class="instruction-group">
+              <div class="instruction-group-title">Set up Authentication</div>
+              <ol class="instruction-steps" start="8">
+                <li>Left sidebar → <strong>Build → Authentication → Get Started</strong></li>
+                <li>Sign-in method → <strong>Google → Enable → Save</strong></li>
+              </ol>
+            </div>
+            <div class="instruction-group">
+              <div class="instruction-group-title">Set up Database</div>
+              <ol class="instruction-steps" start="10">
+                <li>Left sidebar → <strong>Build → Firestore Database → Create database</strong></li>
+                <li>Start in <strong>production mode</strong> → choose any location → Done</li>
+                <li>Go to <strong>Rules tab</strong> → replace everything with:</li>
+              </ol>
+              <pre class="firebase-rules-code"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /securevault_users/{userId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+  }
+}</code></pre>
+              <ol class="instruction-steps" start="13">
+                <li>Click <strong>Publish</strong></li>
+              </ol>
+            </div>
+            <div class="instruction-group">
+              <div class="instruction-group-title">Authorize Your Domain</div>
+              <ol class="instruction-steps" start="14">
+                <li>Go to <strong>Authentication → Settings → Authorized domains</strong></li>
+                <li>Click <strong>Add domain</strong> → enter your GitHub Pages domain (e.g. <code>yourusername.github.io</code>)</li>
+                <li>Without this, Google Sign-in will fail with "unauthorized-domain" error</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="firebase-config-form" id="firebaseConfigForm">
+            <div class="form-group">
+              <label for="fbApiKey">API Key</label>
+              <input type="text" id="fbApiKey" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="fbAuthDomain">Auth Domain</label>
+              <input type="text" id="fbAuthDomain" placeholder="your-project.firebaseapp.com" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="fbProjectId">Project ID</label>
+              <input type="text" id="fbProjectId" placeholder="your-project-id" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="fbStorageBucket">Storage Bucket</label>
+              <input type="text" id="fbStorageBucket" placeholder="your-project.appspot.com" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="fbMessagingSenderId">Messaging Sender ID</label>
+              <input type="text" id="fbMessagingSenderId" placeholder="123456789012" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="fbAppId">App ID</label>
+              <input type="text" id="fbAppId" placeholder="1:123456789012:web:abc123def456" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="firebase-form-actions">
+              <button class="btn btn-primary btn-sm" id="btnSaveFirebase">💾 Save Config</button>
+              <button class="btn btn-outline btn-sm" id="btnTestFirebase">🔌 Test Connection</button>
+            </div>
+            <div class="firebase-status-msg" id="firebaseStatusMsg" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>Data</h4>
+        <div class="settings-row">
+          <button class="btn btn-outline btn-sm" id="btnSettingsExport">&#x1F4E4; Export Vault</button>
+          <button class="btn btn-outline btn-sm" id="btnSettingsImport">&#x1F4E5; Import Vault</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnCloseSettings">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Master Password Modal -->
+  <div class="modal-overlay" id="modalChangeMaster">
+    <div class="modal">
+      <h3>&#x1F511; Change Master Password</h3>
+      <div class="form-group">
+        <label for="currentMasterPass">Current Password</label>
+        <input type="password" id="currentMasterPass" placeholder="Enter current master password">
+      </div>
+      <div class="form-group">
+        <label for="newMasterPass">New Password</label>
+        <input type="password" id="newMasterPass" placeholder="Enter new master password">
+      </div>
+      <div class="form-group">
+        <label for="confirmNewMasterPass">Confirm New Password</label>
+        <input type="password" id="confirmNewMasterPass" placeholder="Confirm new master password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelChangeMaster">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitChangeMaster">&#x1F4BE; Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Password Detail Modal -->
+  <div class="modal-overlay" id="modalDetail">
+    <div class="modal modal-detail">
+      <h3 id="detailTitle">Password Details</h3>
+      <div id="detailContent"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCloseDetail">Close</button>
+        <button class="btn btn-primary" id="btnEditFromDetail">&#x270F;&#xFE0F; Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Format Modal -->
+  <div class="modal-overlay" id="modalExport">
+    <div class="modal modal-export">
+      <h3>&#x1F4E5; Export All Passwords</h3>
+      <p class="export-subtitle">Choose a format to download all your passwords and related information.</p>
+      <div class="export-options">
+        <button class="export-option-card" id="btnExportJSON">
+          <div class="export-card-icon">&#x1F4CB;</div>
+          <div class="export-card-body">
+            <h4>JSON Backup</h4>
+            <p>Full backup file. Best for restoring into SecureVault later.</p>
+          </div>
+        </button>
+        <button class="export-option-card export-option-danger" id="btnExportCSV">
+          <div class="export-card-icon">&#x1F4CA;</div>
+          <div class="export-card-body">
+            <h4>CSV Spreadsheet</h4>
+            <p>Open in Excel, Google Sheets, or any spreadsheet app.</p>
+          </div>
+          <span class="plaintext-badge">PLAINTEXT</span>
+        </button>
+        <button class="export-option-card export-option-danger" id="btnExportTXT">
+          <div class="export-card-icon">&#x1F4C4;</div>
+          <div class="export-card-body">
+            <h4>Plain Text</h4>
+            <p>Human-readable text file with all credential details.</p>
+          </div>
+          <span class="plaintext-badge">PLAINTEXT</span>
+        </button>
+      </div>
+      <div class="export-warning">&#x26A0;&#xFE0F; CSV and TXT exports contain your passwords in readable form. Store them securely and delete after use!</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelExport">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plaintext Export Confirmation Modal -->
+  <div class="modal-overlay" id="modalPlaintextConfirm">
+    <div class="modal">
+      <h3>&#x1F6A8; Plaintext Export Warning</h3>
+      <div class="plaintext-warning-box">
+        <p><strong>This file will contain ALL your passwords in plain text.</strong></p>
+        <p>Anyone who accesses this file — other apps, someone using your device, cloud sync services — will see every password with zero protection.</p>
+        <p>This completely bypasses AES-256 encryption.</p>
+      </div>
+      <div class="form-group" style="margin-top:1.2rem">
+        <label for="plaintextConfirmInput">Type <strong>EXPORT</strong> to confirm:</label>
+        <input type="text" id="plaintextConfirmInput" placeholder="Type EXPORT here..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="btnCancelPlaintext">Cancel</button>
+        <button class="btn btn-primary btn-danger" id="btnConfirmPlaintext" disabled>&#x26A0;&#xFE0F; Export Plaintext</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Auto-lock overlay -->
+  <div class="auto-lock-overlay" id="autoLockOverlay" style="display:none">
+    <div class="auto-lock-content">
+      <div class="lock-icon">&#x1F510;</div>
+      <h2>Vault Locked</h2>
+      <p>Your vault was auto-locked for security.</p>
+      <button class="btn btn-primary" id="btnAutoUnlock">Unlock</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" integrity="sha384-TnlRYaR4JYz/lpaGuaiU61PjNberSA4vjLjtF+oRC/IkohkJqnWxw5EmDSOt1vA1" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" integrity="sha384-qn4Jh88HhJA8dplNQyGjOh9OGI4izVhrfj/qIFgaKcdgOE06pXqIKGlsCILZcLAC" crossorigin="anonymous"></script>
+  <script src="three-scenes.js"></script>
+  <script src="firebase-sync.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
